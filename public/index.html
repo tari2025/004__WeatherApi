@@ -13,11 +13,11 @@
 
       body {
         min-height: 100vh;
-        background: #ffffff;
+        background: #f5f5f5;
         display: flex;
         justify-content: center;
-        align-items: center;
-        padding: 20px;
+        align-items: flex-start; /* ⬅️ penting: mulai dari atas */
+        padding: 40px 20px;
       }
 
       .card {
@@ -56,7 +56,7 @@
       .search {
         display: flex;
         gap: 8px;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
       }
 
       .search input {
@@ -84,6 +84,14 @@
 
       .search button:hover {
         background: #1e4278;
+      }
+
+      /* ⬇️ HASIL DI BAWAH */
+      #hasil {
+        display: none;
+        margin-top: 10px;
+        border-top: 1px solid #f0f0f0;
+        padding-top: 15px;
       }
 
       .result-row {
@@ -136,7 +144,11 @@
   <body>
     <div class="card">
       <div class="header-title">PWS - SEARCH API</div>
+<<<<<<< HEAD
       <div class="header-sub">Deni lestari</div>
+=======
+      <div class="header-sub">Deni Lestari</div>
+>>>>>>> 58e73d5 (REVISI CODE INDEX)
       <div class="header-nim">20240140004</div>
 
       <div class="search">
@@ -146,7 +158,80 @@
           value="Jakarta"
           placeholder="Masukkan nama kota..."
         />
+        <button onclick="cari()">Search</button>
+      </div>
+
+      <div id="loading" class="loading" style="display: none">Memuat...</div>
+      <div id="error" class="error" style="display: none"></div>
+
+      <!-- ⬇️ Hasil tampil DI BAWAH input -->
+      <div id="hasil">
+        <div class="result-row">
+          <div class="label">Place Name</div>
+          <div class="value" id="place_name">-</div>
+        </div>
+        <div class="result-row">
+          <div class="label">Suhu</div>
+          <div class="value suhu-value" id="suhu">-</div>
+        </div>
+        <div class="result-row">
+          <div class="label">Cuaca</div>
+          <div class="value" id="cuaca">-</div>
+        </div>
+        <div class="result-row">
+          <div class="label">Koordinat</div>
+          <div class="value" id="koordinat">-</div>
+        </div>
+        <div class="result-row">
+          <div class="label">Tipe</div>
+          <div class="value" id="tipe">-</div>
+        </div>
       </div>
     </div>
+
+    <script>
+      const input = document.getElementById("inputKota");
+
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") cari();
+      });
+
+      async function cari() {
+        const kota = input.value.trim();
+        if (!kota) return;
+
+        const loading = document.getElementById("loading");
+        const error = document.getElementById("error");
+        const hasil = document.getElementById("hasil");
+
+        loading.style.display = "block";
+        error.style.display = "none";
+        hasil.style.display = "none";
+
+        try {
+          const res = await fetch(
+            `/api/lokasi?kota=${encodeURIComponent(kota)}`,
+          );
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message);
+
+          document.getElementById("place_name").textContent = data.place_name;
+          document.getElementById("suhu").textContent = data.suhu + " °C";
+          document.getElementById("cuaca").textContent = data.cuaca;
+          document.getElementById("koordinat").textContent =
+            data.koordinat[0].toFixed(4) + ", " + data.koordinat[1].toFixed(4);
+          document.getElementById("tipe").textContent = data.tipe;
+
+          hasil.style.display = "block";
+        } catch (err) {
+          error.textContent = "❌ " + err.message;
+          error.style.display = "block";
+        } finally {
+          loading.style.display = "none";
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", cari);
+    </script>
   </body>
 </html>
